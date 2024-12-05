@@ -2,7 +2,7 @@ const { NlpManager } = require("node-nlp");
 
 class QueryAnalyzer {
   constructor() {
-    this.nlpProcessor = new NlpManager({ languages: ["en"] });
+    this.nlpProcessor = new NlpManager({ languages: ["en"],forceNER: true});
     this.brandKeywords = {
       van_heusen: ["van heusen", "vanheusen", "van", "Van Heusen"],
       Peter_England: ["peter england", "peterengland", "peter", "Peter_England"],
@@ -16,7 +16,7 @@ class QueryAnalyzer {
   }
 
   async analyzeQueryPayload(queryPayload) {
-  
+
     return queryPayload.map(({ query, filters }) => {
       if (!query || typeof query !== "string") {
         throw new Error("Invalid query input. Query must be a non-empty string.");
@@ -46,17 +46,19 @@ class QueryAnalyzer {
   extractCategories(query) {
     const categories = [];
     const lowercaseQuery = query.toLowerCase();
-
+    
     for (const [category, keywords] of Object.entries(this.categoryKeywords)) {
+    
       if (keywords.some((keyword) => lowercaseQuery.includes(keyword))) {
         categories.push(category);
       }
     }
+    
     return categories;
   }
 
   extractFilters(filters) {
-    const defaultFilters = { size: [], color: [], stock: null };
+    const defaultFilters = { size: [], color: [], stock: null,price: { min: null, max: null } };
     if (!filters || typeof filters !== "object") {
       return defaultFilters;
     }
@@ -65,6 +67,7 @@ class QueryAnalyzer {
       size: filters.size ? [filters.size] : [],
       color: filters.color ? [filters.color] : [],
       stock: filters.stock || null,
+      price: filters.price || { min: null, max: null },
     };
   }
 }

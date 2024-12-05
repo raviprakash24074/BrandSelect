@@ -30,6 +30,9 @@ class ResultAggregator {
       if(result["Brand"] !== undefined){
         normalized["Brand"]=result["Brand"];
       }
+      if(result["id"] !== undefined){
+        normalized["id"]=result["id"];
+      }
       
       return normalized;
     }

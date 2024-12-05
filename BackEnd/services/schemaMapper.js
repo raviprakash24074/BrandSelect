@@ -5,6 +5,7 @@ class SchemaMapper {
   constructor() {
     this.semanticMatcher = new SemanticMatcher();
     this.unifiedSchema = [
+      'Id',
       'name',
       'category',
       'size',

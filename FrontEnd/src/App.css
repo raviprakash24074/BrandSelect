@@ -74,6 +74,13 @@ body {
   height: 80px;
   resize: none;
 }
+.price-range input {
+  margin: 5px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: calc(50% - 10px);
+}
 
 /* Buttons */
 button {
