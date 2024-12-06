@@ -31,15 +31,19 @@ async function initialize() {
   );
 
   function extractJSON(rawResponse) {
-    if (typeof rawResponse !== "string") {
+    if (typeof rawResponse !== "string")
+    {
       console.error("rawResponse is not a string:", rawResponse);
       return { error: "Invalid response format from LLM" };
     }
     const jsonMatch = rawResponse.match(/{.*}/s);
-    if (jsonMatch) {
-      try {
+    if (jsonMatch)
+    {
+      try
+      {
         return JSON.parse(jsonMatch[0]);
-      } catch (e) {
+      } catch (e)
+      {
         console.error("Failed to parse JSON:", e);
         return { error: "Invalid JSON format" };
       }
@@ -47,27 +51,9 @@ async function initialize() {
     return { error: "No JSON object found in response" };
   }
 
-  //   app.post('/query', async (req, res) => {
-  //   try {
-  //     const { queries: userQueries, filters } = req.body;
-  //     const queryPayload = userQueries.map((query, index) => ({
-  //       query,
-  //       filters: filters[index],
-  //     }));
-
-  //     console.log('Mapped Query Payload:', JSON.stringify(queryPayload, null, 2));
-  //     const results = await federationService.executeQuery(queryPayload);
-  //     res.json({ results });
-  //   } catch (error) {
-  //     if (error.message.includes('No results found')) {
-  //       res.status(404).json({ error: 'No results found. Check your query or database availability.' });
-  //     } else {
-  //       res.status(500).json({ error: 'Internal server error' });
-  //     }
-  //   }
-  // });
   app.post("/query", async (req, res) => {
-    try {
+    try
+    {
       const { queries: userQueries, filters } = req.body;
       const queryPayload = userQueries.map((query, index) => ({
         query,
@@ -80,112 +66,31 @@ async function initialize() {
       );
       const results = await federationService.executeQuery(queryPayload);
       res.json({ results });
-    } catch (error) {
-      if (error.message.includes("No results found")) {
+    } catch (error)
+    {
+      if (error.message.includes("No results found"))
+      {
         res.status(404).json({
           error: "No results found. Check your query or database availability.",
         });
-      } else {
+      } else
+      {
         res.status(500).json({ error: "Internal server error" });
       }
     }
   });
 
-  app.post("/buy", async (req, res) => {
-    const { Id, brand } = req.body;
-    console.log("buy:", Id, brand) 
-    try {
-      console.log('1');
-      // Handle Van Heusen (MySQL) products
-      if (brand === "Van Heusen") {
-        const connection = await dbConnections.getConnection("van_heusen");
-        const [product] = await connection.execute(
-          `SELECT product_stock FROM products WHERE product_id = ?`,
-          [Id]
-        );
-        console.log('2')
-        console.log('prod',product);
-        if (!product.length)
-          return res.status(404).json({ error: "Product not found" });
-        if (product[0].stock === 0)
-          return res.status(400).json({ error: "Out of stock" });
-
-        const newStock = product[0].stock - 1;
-        if (newStock === 0) {
-          await connection.execute(`DELETE FROM products WHERE product_id = ?`, [
-            Id,
-          ]);
-          return res.json({ success: true, stock: 0 });
-        } else {
-          await connection.execute(
-            `UPDATE products SET product_stock = ? WHERE product_id = ?`,
-            [newStock, Id]
-          );
-          return res.json({ success: true, stock: newStock });
-        }
-      }
-
-      // Handle Peter England (MongoDB) products
-      if (brand === "Peter England") {
-        const connection = await dbConnections.getConnection("Peter_England");
-        const product = await connection.db
-          .collection("Items")
-          .findOne({ _id: Id });
-
-        if (!product)
-          return res.status(404).json({ error: "Product not found" });
-        if (product.stock === 0)
-          return res.status(400).json({ error: "Out of stock" });
-
-        const newStock = product.stock - 1;
-        if (newStock === 0) {
-          await connection.db.collection("Items").deleteOne({ _id: Id });
-          return res.json({ success: true, stock: 0 });
-        } else {
-          await connection.db
-            .collection("Items")
-            .updateOne({ _id: Id }, { $set: { stock: newStock } });
-          return res.json({ success: true, stock: newStock });
-        }
-      }
-
-      return res.status(400).json({ error: "Invalid brand" });
-    } catch (error) {
-      console.error("Error processing buy request:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
-
   app.post("/text-query", async (req, res) => {
-    try {
+    try
+    {
       const userQuery = req.body.query;
-      if (!userQuery) {
+      if (!userQuery)
+      {
         return res.status(400).json({ error: "Query is required" });
       }
 
       console.log(`User Query: ${userQuery}`);
 
-      // Define recognized brands using regex patterns
-      // const recognizedBrands = {
-      //   "peter england": /peter\s*england/i,
-      //   "van heusen": /van\s*heusen|van/i,
-      // };
-
-      // // Detect brand in the query
-      // let brand = null;
-      // for (const [key, pattern] of Object.entries(recognizedBrands)) {
-      //   if (pattern.test(userQuery)) {
-      //     brand = key;
-      //     break;
-      //   }
-      // }
-      // console.log("brand",brand);
-      // // Handle unrecognized brands
-      // if (!brand && /brand|company/i.test(userQuery)) {
-      //   return res.status(400).json({
-      //     error: "No recognized brand found. Supported brands are Peter England and Van Heusen.",
-      //   });
-      // }
       const adjustedPrompt = `
   Parse the following user query: "${userQuery}".
   - Detect the target brand using regex:
@@ -228,7 +133,12 @@ async function initialize() {
        "mysql": "SELECT * FROM products WHERE category='jeans' AND size='32' AND price >= 500 AND price <= 1500;",
        "mongodb": {"category": {"$regex": "^jeans$", "$options": "i"}, "size": {"$regex": "^32$", "$options": "i"}, "price": {"$gte": 500, "$lte": 1500}}
      }
-
+  4. **Query**: "Find shirts 
+      **Output**: 
+      {
+          "mysql": "SELECT * FROM products WHERE category='shirts';",
+          "mongodb": {"category": {"$regex": "^shirts$","$options": "i"}}
+      }
   Ensure the brand name is not included as a filter in either SQL or MongoDB queries.
   Ensure the response is valid JSON and ends after the closing brace.
 `;
@@ -296,7 +206,8 @@ async function initialize() {
       });
 
       // Check if no results were retrieved from both databases
-      if (!dbResults.mysql && !dbResults.mongodb) {
+      if (!dbResults.mysql && !dbResults.mongodb)
+      {
         console.warn("Both databases are unavailable or returned no data.");
         return res.status(404).json({
           error:
@@ -315,15 +226,29 @@ async function initialize() {
       const aggregatedResults =
         this.resultAggregator.aggregateResults(combinedResults);
 
-      // Generate recommendations using LLM
-      const recommendationsPrompt = `
-        Based on the query: "${userQuery}",
-        - Suggest complementary products or insights related to the query.
-        - Examples:
-          - Suggest matching items (e.g., jeans for shirts, belts for trousers).
-          - Provide general sizing advice if size is mentioned.
-        - Limit the response to 3 sentences.
-      `;
+      const recommendationsPrompt = `Based on the user query: "${userQuery}":
+        Based on the provided query, adhere to the following guidelines while ensuring the response is aligned with the user's needs and contains innovative and actionable insights. **Do not include any variables in the response.** Always generate content that is new and directly relevant to the requirements.
+
+        1. **Trend Analysis**:
+          - Analyze the latest fashion trends related to the query. Highlight whether the mentioned style, item, or combination is currently popular, emerging, or a timeless choice.
+
+        2. **Creative Outfit Suggestions**:
+          - Provide innovative outfit ideas for both formal and casual styles. Include suggestions for clothing combinations, such as pairing shirts with trousers or jeans, adding appropriate footwear, and enhancing with accessories.
+
+        3. **Color Matching**:
+          - Recommend complementary colors for the clothing items mentioned, ensuring a cohesive and visually appealing outfit. If applicable, include advice on matching accessories to create a balanced and stylish look.
+
+        4. **Brand-Specific Insights**:
+          - If a brand is specified, share details about its typical fabric quality, common product offerings, and a sample review of a relevant item (e.g., "The lightweight fabric is ideal for summer wear, offering excellent durability and comfort according to user reviews.").
+
+        5. **General Sizing Advice**:
+          - Provide helpful sizing tips tailored to the clothing type (e.g., shirts, jeans). Include general guidance for ensuring the best fit and advice on size adjustments if necessary.
+
+        6. **Style Guidance**:
+          - Suggest suitable options for formal and casual occasions. For formal wear, recommend shoes and accessories like belts or ties. For casual wear, suggest complementary footwear or layering items like jackets or hoodies.
+
+        Ensure the response is concise, detailed, and limited to **five sentences** while providing actionable insights to enhance the shopping experience.
+        `;
 
       const recommendationResult = await model.generateContent(
         recommendationsPrompt,
@@ -332,12 +257,13 @@ async function initialize() {
 
       console.log(recommendationResult.response.text());
 
-      // Return results and recommendations
+  
       res.json({
         results: aggregatedResults,
         recommendations: recommendationResult.response.text(),
       });
-    } catch (error) {
+    } catch (error)
+    {
       console.error("Error processing text query:", error);
       res.status(500).json({ error: "Internal server error" });
     }
@@ -351,6 +277,32 @@ async function initialize() {
 initialize().catch((err) => {
   console.error("Failed to initialize the server:", err);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // app.post("/text-query", async (req, res) => {
 //   try {

@@ -168,3 +168,44 @@ button:disabled {
   color: #555;
   line-height: 1.5;
 }
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.result-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.result-item h3 {
+  font-size: 1.5rem;
+  color: #1976d2;
+}
+
+.result-item button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #ff5722;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.result-item button:hover {
+  background-color: #e64a19;
+}
+.query-builder {
+  display: flex;
+  gap: 10px;
+  margin: 20px;
+}
+
+

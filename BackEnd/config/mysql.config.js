@@ -2,10 +2,10 @@
 const mysql = require('mysql2/promise');
 
 const vanHeusenConfig = {
-  host: 'localhost',
+  host: '192.168.41.133',
   port: 3306,
   user: 'root',
-  password: '802203',
+  password: 'Akash@12706',
   database: 'van_heusen'
 };
 

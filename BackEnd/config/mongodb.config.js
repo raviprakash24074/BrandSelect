@@ -1,7 +1,7 @@
 // backend/config/mongodb.config.js
 const mongoose = require('mongoose');
 const peterEnglandConfig = {
-  url: 'mongodb://127.0.0.1:27017/Peter_England',
+  url: 'mongodb://192.168.41.199:27017/Peter_England',
   database:'Peter_England'
 };
 

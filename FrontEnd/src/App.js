@@ -1,3 +1,10 @@
+
+
+
+
+
+
+
 import React, { useState } from "react";
 import axios from "axios";
 import "./App.css";
@@ -259,16 +266,16 @@ function App() {
               <div key={idx} className="result-item">
                 <h3>{item.brand}</h3>
                 <p>Name: {item.name}</p>
-                <p>Id: {item.id}</p>
+               
                 <p>Category: {item.category}</p>
                 <p>Price: {item.price}</p>
                 <p>Color: {item.color}</p>
                 <p>Size: {item.size}</p>
                 <p>Stock: {item.stock}</p>
                 <p>Brand: {item.Brand}</p>
-                <button onClick={() => handleBuyNow(item.id, item.Brand)}>
-                  Buy Now
-                </button>
+                <a href={link} target="_blank" rel="noopener noreferrer">
+                <button>Buy Now</button>
+              </a>
               </div>
             );
           })}
@@ -284,3 +291,4 @@ function App() {
 }
 
 export default App;
+

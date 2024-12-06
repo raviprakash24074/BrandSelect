@@ -16,12 +16,13 @@ class QueryFederation {
     const analysisResults = await this.queryAnalyzer.analyzeQueryPayload(
       queryPayload
     );
-    console.log('query',analysisResults);
+    console.log('query',...analysisResults);
     const subQueries = await Promise.all(
       analysisResults.map((analysis) =>
         this.queryDecomposer.decomposeQuery(analysis)
       )
     );
+    console.log('subQueries',subQueries);
     const results = [];
     const dbStatus = DatabaseConnections.getStatus();
     // const results = await Promise.all(
@@ -48,6 +49,7 @@ class QueryFederation {
     for (const subQuery of subQueries.flat()) {
       if (dbStatus[subQuery.brand] && this.connections.getMetadata().metadata[subQuery.brand]?.schema) {
         try {
+          console.log("Skipping query for brand",subQuery)
           const result = await this.executeSubQuery(subQuery);
           results.push(...result);
         } catch (error) {
@@ -58,11 +60,11 @@ class QueryFederation {
       }
     }
 
-    if (results.length === 0) {
-      throw new Error(
-        "No results found. Check your query or database availability."
-      );
-    }
+    // if (results.length === 0) {
+    //   throw new Error(
+    //     "No results found. Check your query or database availability."
+    //   );
+    // }
     return this.resultAggregator.aggregateResults(results.flat());
   }
 
@@ -87,10 +89,12 @@ class QueryFederation {
   }
 
   async executeMongoDB(connection, query) {
+    console.log('1');
     const results = await connection.db
       .collection("Items")
       .find(query)
       .toArray();
+    
     return results.map((item) => ({ id: item._id,...item, Brand: "Peter England" }));
   }
 }
